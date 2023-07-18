@@ -1,0 +1,77 @@
+﻿@model SistemaInventario.Models.Bodega;
+@{
+    ViewData["Title"] = "Upsert";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var titulo = "Crear Bodega";
+}
+
+<form method="post">
+    <div class"pl-3 pr-3 pb-4">
+        <div class="row border-0">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        </div>
+        @if (Model.Id != 0)
+        {
+            //actualizar
+            titulo = "Actualizar Bodega";
+            <input type="hidden" asp-for="Id" id="id" />
+        }
+        <div class="col-12 border-bottom p-0">
+            <h2 class="text-primary">@titulo</h2>
+        </div>
+
+        <div clas="rpw mb-2 mt-2">
+            <div class="form-group col-md-6">
+                <label>Nombre</label>
+                <input type="text" asp-for="Nombre" class="form-control" placeholder="nombre de la bodega"/>
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+        </div>
+        <div clas="rpw mb-2 mt-2">
+            <div class="form-group col-md-6">
+                <label>Descripcion</label>
+                <input type="text" asp-for="Descripcion" class="form-control" placeholder="descripcion de la bodega"/>
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+        </div>
+        <div clas="rpw mb-2 mt-2">
+            <div class="form-group col-md-6">
+                <label>Estado</label>
+                <select asp-for="Estado" class="form-select">
+                    <option value=true>Activo</option>
+                    <option value=false>Inactivo</option>
+                </select>
+                <span asp-validation-for="Estado" class="text-danger"></span>
+            </div>
+        </div>
+        <br />
+
+        <div>
+            @if (Model.Id!=0)
+            {
+                <div class="d-grid gap-2 d-md-block">
+                    <button type="submit" class="btn btn-primary" onfocus="false" asp-route-id="@Model.Id">  
+                        <i class="bi bi-pencil-square"></i> Guardar Cambios </button>
+                    <a asp-action="Index" class="btn btn-success"> <i class="bi bi-arrow-return-left"></i> Regresar </a>
+                </div>
+            }
+            else
+            {
+                
+                @if (Model.Id != 0)
+                {
+                        <partial name="_BotonesActualizarYRegresar" model="Model.Id" />
+                }
+                else
+                {
+                        <partial name="_BotonesCrearYRegresar" />
+                }
+            }
+            
+        </div>
+    </div>
+
+</form>
+@section Scripts{
+    <partial name="_ValidationScriptsPartial"></partial>
+}

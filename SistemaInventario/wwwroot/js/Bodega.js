@@ -12,16 +12,19 @@ function loadDataTable() {
 		columns: [
 			{ data: 'nombre', width: '20%' },
 			{ data: 'descripcion', width: '40%' },
-			/* { data: 'estado',
+			{
+				data: 'estado',
 				render: function (data) {
-					console.log(data);					
-					data == true ? 'Activo' : 'Inactivo';
+					if (data) {
+						return 'Activo';
+					} else {
+						return 'Inactivo';
+					}
 				},
-				width: '20%',
+				width: '40%',
 			},
-			 */
-			{ data: 'estado', render:function(data){if(data){return "Activo"}else{return "Inactivo"}}, width: '40%' },
-			{ data: 'id',
+			{
+				data: 'id',
 				render: function (data) {
 					return `
 						<div class="text-center">
