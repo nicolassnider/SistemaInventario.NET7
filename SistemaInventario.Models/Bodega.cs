@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Resources;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,12 +14,12 @@ namespace SistemaInventario.Models
         [Key]
         public int Id { get; set; }
 
-        [Required(ErrorMessage ="Nombre requerido")]
-        [MaxLength(60,ErrorMessageResourceName ="Maximo 60 caracteres")]
+        [Required(ErrorMessage = "Nombre es Requerido")]
+        [MaxLength(60, ErrorMessage = "Maximo 60 caracteres")]
         public string Nombre { get; set; }
 
         [Required(ErrorMessage = "Descripcion requerido")]
-        [MaxLength(100, ErrorMessageResourceName = "Maximo 60 caracteres")]
+        [MaxLength(100, ErrorMessage = "Maximo 60 caracteres")]
         public string Descripcion { get; set; }
 
         [Required(ErrorMessage = "Estado requerido")]
