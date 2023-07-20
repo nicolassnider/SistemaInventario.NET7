@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SistemaInventario.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace SistemaInventario.AccesoDatos.Repositorio.IRepositorio
 {
-    public interface IUnitOfWork:IDisposable
+    public interface ICategoriaRepository : IRepositorio<Categoria>
     {
-        IBodegaRepository Bodega { get; }
-        ICategoriaRepository Categoria { get; }
-        Task Save();
+        void Update(Categoria categoria);
+
     }
 }
