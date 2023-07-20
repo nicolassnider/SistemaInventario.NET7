@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Resources;
-using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace SistemaInventario.Models
 {
-    public class Bodega
+    public class Categoria
     {
         [Key]
         public int Id { get; set; }
@@ -24,5 +22,6 @@ namespace SistemaInventario.Models
 
         [Required(ErrorMessage = "Estado requerido")]
         public bool Estado { get; set; }
+
     }
 }
