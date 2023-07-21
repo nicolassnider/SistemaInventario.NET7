@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SistemaInventario.AccesoDatos.Repositorio.IRepositorio
 {
-    public interface ICategoriaRepository : IRepositorio<Categoria>
+    public interface ICategoriaRepository : IRepository<Categoria>
     {
         void Update(Categoria categoria);
 

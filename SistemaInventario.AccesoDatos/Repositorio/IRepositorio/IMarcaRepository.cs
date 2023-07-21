@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SistemaInventario.AccesoDatos.Repositorio.IRepositorio
 {
-    public interface IMarcaRepository : IRepositorio<Marca>
+    public interface IMarcaRepository : IRepository<Marca>
     {
         void Update(Marca marca);
 

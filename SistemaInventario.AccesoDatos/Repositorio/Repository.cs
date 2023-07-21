@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SistemaInventario.AccesoDatos.Repositorio
 {
-    public class Repository<T> : IRepositorio<T> where T : class
+    public class Repository<T> : IRepository<T> where T : class
     {
 
         private readonly ApplicationDbContext _db;
