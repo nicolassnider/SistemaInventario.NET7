@@ -10,6 +10,7 @@ namespace SistemaInventario.AccesoDatos.Repositorio.IRepositorio
     {
         IBodegaRepository Bodega { get; }
         ICategoriaRepository Categoria { get; }
+        IMarcaRepository Marca { get; }
         Task Save();
     }
 }

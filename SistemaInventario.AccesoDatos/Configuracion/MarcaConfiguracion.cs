@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SistemaInventario.AccesoDatos.Configuracion
 {
-    public class CategoriaConfiguracion : IEntityTypeConfiguration<Categoria>
+    internal class MarcaConfiguracion : IEntityTypeConfiguration<Categoria>
     {
         public void Configure(EntityTypeBuilder<Categoria> builder)
         {
