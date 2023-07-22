@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using SistemaInventario.AccesoDatos.Data;
 using SistemaInventario.AccesoDatos.Repositorio;
 using SistemaInventario.AccesoDatos.Repositorio.IRepositorio;
+using SistemaInventario.Utilidades;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,10 +14,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+/*builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<ApplicationDbContext>();*/ //no permite trabajar con roles
+builder.Services.AddIdentity<IdentityUser,IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddDefaultTokenProviders() //agregar manejo de token
     .AddEntityFrameworkStores<ApplicationDbContext>();
-builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();//Se agrega para poder modificar razor en tiempo de ejecución
+builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();//Se agrega para poder modificar razor en tiempo de ejecuciï¿½n
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddRazorPages();//paginas de razor
+builder.Services.AddSingleton<IEmailSender,EmailSender>();
 
 var app = builder.Build();
 
