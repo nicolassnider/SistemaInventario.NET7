@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
+using SistemaInventario.AccesoDatos.Migrations;
 using SistemaInventario.AccesoDatos.Repositorio.IRepositorio;
 using SistemaInventario.Models;
 using SistemaInventario.Models.ViewModels;
@@ -10,9 +12,11 @@ namespace SistemaInventario.Areas.Admin.Controllers
     public class ProductoController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        public ProductoController(IUnitOfWork unitOfWork)
+        private IWebHostEnvironment _webHostEnvironment;
+        public ProductoController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;   
         }
         public IActionResult Index()
         {
@@ -30,25 +34,90 @@ namespace SistemaInventario.Areas.Admin.Controllers
             if (id==null)
             {
                 //crear nuevo producto
+                productoVM.Producto.Estado = true;
                 return View(productoVM);
             }
             else
             {
                 productoVM.Producto= await _unitOfWork.Producto.Get(id.GetValueOrDefault());
                 if (productoVM.Producto == null) return NotFound("Producto no encontrado");
-                return View();
+                return View(productoVM);
             }
+
+            
             
 
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Upsert(ProductoVM productoVM)
+        {
+            if (ModelState.IsValid)
+            {
+                var files = HttpContext.Request.Form.Files;
+                string webRootPath = _webHostEnvironment.WebRootPath;
+                if (productoVM.Producto.Id==0)
+                {
+                    //Crear
+                    string upload = webRootPath + DS.ImagenRuta;
+                    string fileName = Guid.NewGuid().ToString();
+                    string extension = Path.GetExtension(files[0].FileName);
+
+                    using (
+                        var fileStream = 
+                        new FileStream(Path.Combine(upload,fileName+extension),FileMode.Create))
+                    {
+                        files[0].CopyTo(fileStream);
+                    }
+                    productoVM.Producto.ImagenUrl = fileName + extension;
+                    await _unitOfWork.Producto.Add(productoVM.Producto);
+
+                }
+                else
+                {
+                    //actualizar
+                    var objProducto = await _unitOfWork.Producto.GetFirstOrDefault(p => p.Id == productoVM.Producto.Id, isTracking:false);
+                    if (files.Count>0 ) // se selecciono una nueva imagen 
+                    {
+                        string upload = webRootPath+DS.ImagenRuta;
+                        string fileName = Guid.NewGuid().ToString();
+                        string extension = Path.GetExtension(files[0].FileName);
+                        //borrar imagen anterior
+                        var prevFile = Path.Combine(upload, objProducto.ImagenUrl);
+                        if (System.IO.File.Exists(prevFile))
+                        {
+                            System.IO.File.Delete(prevFile);
+                        }
+                        using(var fileStream = new FileStream(Path.Combine(upload,fileName+extension),FileMode.Create))
+                        {
+                            files[0].CopyTo(fileStream);
+                        }
+                        productoVM.Producto.ImagenUrl= fileName + extension;
+                    }
+                    else
+                    {
+                        productoVM.Producto.ImagenUrl= objProducto.ImagenUrl;
+                    }
+                    _unitOfWork.Producto.Update(productoVM.Producto);
+
+                }
+                TempData[DS.Exitosa] = "Transaccion exitosa";
+                await _unitOfWork.Save();
+                return View("Index");
+            }
+            productoVM.CategoriaLista = _unitOfWork.Producto.GetAllDropdownList("Categoria");
+            productoVM.MarcaLista = _unitOfWork.Producto.GetAllDropdownList("Marca");
+            return View(productoVM);
+        }
+        
         #region API
 
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var productos = await _unitOfWork.Marca.GetAll(includeProperties:"Categoria,Marca");//para traer las propiedades
+            var productos = await _unitOfWork.Producto.GetAll(includeProperties:"Marca,Categoria");//para traer las propiedades
             return Json(new { data = productos });
         }
 
@@ -60,6 +129,12 @@ namespace SistemaInventario.Areas.Admin.Controllers
             {
                 return Json(new
                 { success = false, message = "Error al borrar producto" });
+            }
+            string upload = _webHostEnvironment.WebRootPath + DS.ImagenRuta;
+            var prevFile = Path.Combine(upload, productoDb.ImagenUrl);
+            if (System.IO.File.Exists(prevFile))
+            {
+                System.IO.File.Delete(prevFile);
             }
             _unitOfWork.Producto.Remove(productoDb);
             await _unitOfWork.Save();

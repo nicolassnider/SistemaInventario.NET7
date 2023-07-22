@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SistemaInventario.AccesoDatos.Configuracion
 {
-    internal class BodegaConfiguracion : IEntityTypeConfiguration<Bodega>
+    public class BodegaConfiguracion : IEntityTypeConfiguration<Bodega>
     {
         public void Configure(EntityTypeBuilder<Bodega> builder)
         {

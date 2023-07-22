@@ -6,7 +6,7 @@ $(document).ready(function () {
 
 function loadDataTable() {
 	datatable = $('#tblDatos').DataTable({
-		languaje: {
+		language: {
 			lengthMenu: "Mostrar _MENU_ Registros por página",
 			zeroRecords: "Ningún Registro",
 			info: "Mostrar page _PAGE_ de _PAGES_",
@@ -29,7 +29,7 @@ function loadDataTable() {
 			{ data: 'categoria.nombre' },
 			{ data: 'marca.nombre' },
 			{
-				date: 'precio',
+				data: 'precio',
 				className: "text-end",
 				render: function (data) {
 					var d = data.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
