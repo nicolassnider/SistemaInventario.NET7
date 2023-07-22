@@ -15,6 +15,7 @@ namespace SistemaInventario.AccesoDatos.Repositorio
         public ICategoriaRepository Categoria { get; private set; }
         public IMarcaRepository Marca { get; private set; }
         public IProductoRepository Producto { get; private set; }
+        public IUsuarioAplicacionRepositorio UsuarioAplicacion { get; private set; }
 
         public UnitOfWork(ApplicationDbContext db)
         {
@@ -23,6 +24,7 @@ namespace SistemaInventario.AccesoDatos.Repositorio
             Categoria = new CategoriaRepository(_db);
             Marca = new MarcaRepository(_db);
             Producto = new ProductoRepository(_db);
+            UsuarioAplicacion = new UsuarioAplicacionRepository(_db);
         }        
 
         public void Dispose()
