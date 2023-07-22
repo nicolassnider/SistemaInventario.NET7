@@ -6,7 +6,7 @@ $(document).ready(function () {
 
 function loadDataTable() {
 	datatable = $('#tblDatos').DataTable({
-		languaje: {
+		language: {
 			lengthMenu: "Mostrar _MENU_ Registros por página",
 			zeroRecords: "Ningún Registro",
 			info: "Mostrar page _PAGE_ de _PAGES_",
@@ -21,11 +21,21 @@ function loadDataTable() {
 			}
 		},
 		ajax: {
-			url: '/Admin/Marca/GetAll',
+			url: '/Admin/Producto/GetAll',
 		},
 		columns: [
-			{ data: 'nombre', width: '20%' },
-			{ data: 'descripcion', width: '40%' },
+			{ data: 'numeroSerie' },
+			{ data: 'descripcion'},
+			{ data: 'categoria.nombre' },
+			{ data: 'marca.nombre' },
+			{
+				data: 'precio',
+				className: "text-end",
+				render: function (data) {
+					var d = data.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+					return d
+				}
+			},
 			{
 				data: 'estado',
 				render: function (data) {
@@ -34,24 +44,22 @@ function loadDataTable() {
 					} else {
 						return 'Inactivo';
 					}
-				},
-				width: '40%',
+				},				
 			},
 			{
 				data: 'id',
 				render: function (data) {
 					return `
 						<div class="text-center">
-							<a href="/Admin/Marca/Upsert/${data}" class="btn btn-success text-white" style="cursor:pointer">
+							<a href="/Admin/Producto/Upsert/${data}" class="btn btn-success text-white" style="cursor:pointer">
 								<i class="bi bi-pencil-square"></i>
 							</a>
-							<a onclick=Delete("/Admin/Marca/Delete/${data}") class="btn btn-danger text-white" style="cursor:pointer">
+							<a onclick=Delete("/Admin/Producto/Delete/${data}") class="btn btn-danger text-white" style="cursor:pointer">
 								<i class="bi bi-trash"></i>
 							</a>
 						</div>
 					`;
 				},
-				width: '20%',
 			},
 		],
 	});
@@ -75,7 +83,7 @@ function Delete(url) {
 						toastr.success(data.message);
 						datatable.ajax.reload()
 					} else {
-						toastr.error(data.message);
+						toast.error(data.message);
 					}
 				}
 			});
