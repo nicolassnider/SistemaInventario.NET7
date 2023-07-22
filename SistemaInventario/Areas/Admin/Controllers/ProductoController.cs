@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
 using SistemaInventario.AccesoDatos.Migrations;
+using SistemaInventario.AccesoDatos.Repositorio;
 using SistemaInventario.AccesoDatos.Repositorio.IRepositorio;
 using SistemaInventario.Models;
 using SistemaInventario.Models.ViewModels;
@@ -29,7 +30,8 @@ namespace SistemaInventario.Areas.Admin.Controllers
             {
                 Producto = new Producto(),
                 CategoriaLista = _unitOfWork.Producto.GetAllDropdownList("Categoria"),
-                MarcaLista = _unitOfWork.Producto.GetAllDropdownList("Marca")
+                MarcaLista = _unitOfWork.Producto.GetAllDropdownList("Marca"),
+                PadreLista = _unitOfWork.Producto.GetAllDropdownList("Producto")
             };
             if (id==null)
             {
@@ -108,6 +110,7 @@ namespace SistemaInventario.Areas.Admin.Controllers
             }
             productoVM.CategoriaLista = _unitOfWork.Producto.GetAllDropdownList("Categoria");
             productoVM.MarcaLista = _unitOfWork.Producto.GetAllDropdownList("Marca");
+            productoVM.PadreLista = _unitOfWork.Producto.GetAllDropdownList("Producto");
             return View(productoVM);
         }
         

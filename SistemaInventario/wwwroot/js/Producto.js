@@ -78,7 +78,7 @@ function Delete(url) {
 			$.ajax({
 				type: "POST",
 				url: url,
-				success: function () {
+				success: function (data) {
 					if (data.success) {
 						toastr.success(data.message);
 						datatable.ajax.reload()

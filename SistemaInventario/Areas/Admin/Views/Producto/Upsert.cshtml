@@ -81,6 +81,14 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6">
+                            <label>Producto Padre</label>
+                            <select asp-for="Producto.PadreId" asp-items="@Model.PadreLista" class="form-select">
+                                <option disabled selected>--Productos</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
                             <label>Estado</label>
                             <select asp-for="Producto.Estado" class="form-select">
                                 <option value=true>Activo</option>
