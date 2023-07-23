@@ -20,6 +20,14 @@ builder.Services.AddIdentity<IdentityUser,IdentityRole>(options => options.SignI
     .AddErrorDescriber<ErrorDescriber>()
     .AddDefaultTokenProviders() //agregar manejo de token
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.ConfigureApplicationCookie(options => //configuración de auth
+{
+    options.LoginPath = $"/Identity/Account/Login";
+    options.LogoutPath = $"/Identity/Account/Logout";
+    options.AccessDeniedPath = $"/IDentity/Account/AccessDenied";
+});
+
 builder.Services.Configure<IdentityOptions>(options => //reglas de password
 {
     options.Password.RequireDigit = true;
@@ -50,6 +58,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
