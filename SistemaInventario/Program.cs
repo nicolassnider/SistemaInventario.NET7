@@ -17,8 +17,15 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 /*builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();*/ //no permite trabajar con roles
 builder.Services.AddIdentity<IdentityUser,IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddErrorDescriber<ErrorDescriber>()
     .AddDefaultTokenProviders() //agregar manejo de token
     .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.Configure<IdentityOptions>(options => //reglas de password
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireNonAlphanumeric = false;
+});
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();//Se agrega para poder modificar razor en tiempo de ejecuci�n
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddRazorPages();//paginas de razor
