@@ -177,7 +177,14 @@ namespace SistemaInventario.Areas.Identity.Pages.Account
                         await _roleManager.CreateAsync(new IdentityRole(DS.Role_Inventario));
                     }
 
-                    await _userManager.AddToRoleAsync(user, DS.Role_Admin);
+                    if (user.Role == null)  // El Valor que recibe desde el Page
+                    {
+                        await _userManager.AddToRoleAsync(user, DS.Role_Cliente);
+                    }
+                    else
+                    {
+                        await _userManager.AddToRoleAsync(user, user.Role);
+                    }
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     /*var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -201,6 +208,13 @@ namespace SistemaInventario.Areas.Identity.Pages.Account
                         return LocalRedirect(returnUrl);
                     }
                 }
+                Input = new InputModel //evita que se pierdan los roles cuando hay error
+                {
+                    ListaRole = _roleManager.Roles
+                .Where(r => r.Name != DS.Role_Cliente)
+                .Select(n => n.Name)
+                .Select(l => new SelectListItem { Text = l, Value = l })
+                };
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
