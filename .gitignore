@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 # excluir nuevos archivos de imágenes subidas
 /SistemaInventario/wwwroot/img/producto/*
+/SistemaInventario/appsettings.json
