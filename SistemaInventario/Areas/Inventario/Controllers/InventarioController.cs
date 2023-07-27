@@ -14,36 +14,63 @@ namespace SistemaInventario.Areas.Inventario.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         [BindProperty]//la utilizamos en todo el modelo y permanentemente cambiará su valor
-        public InventarioVM InventarioVM { get; set; }
+        public InventarioVM inventarioVM { get; set; }
 
         public InventarioController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        public IActionResult NuevoInventario()
-        {
-            InventarioVM = new InventarioVM()
-            {
-                Inventario= new Models.Inventario(), //genera conflictos por repetir el nombre
-                BodegaList = _unitOfWork.Inventario.GetAllDropdownList("Bodega"),
-                //no es necesario completar todos las propiedades
-            };
-            InventarioVM.Inventario.Estado = false;
-            //obtener id de usuario
-            var claimIdentity = (ClaimsIdentity)User.Identity;
-            var claim = claimIdentity.FindFirst(ClaimTypes.NameIdentifier);
-            InventarioVM.Inventario.UsuarioAplicacionId = claim.Value;
-            InventarioVM.Inventario.FechaInicial = DateTime.Now;
-            InventarioVM.Inventario.FechaFinal = DateTime.Now;
-            return View(InventarioVM);
-        }
         public IActionResult Index()
         {
             return View();
         }
 
+        public IActionResult NuevoInventario()
+        {
+            inventarioVM = new InventarioVM()
+            {
+                Inventario= new Models.Inventario(), //genera conflictos por repetir el nombre
+                BodegaList = _unitOfWork.Inventario.GetAllDropdownList("Bodega"),
+                //no es necesario completar todos las propiedades
+            };
+            inventarioVM.Inventario.Estado = false;
+            //obtener id de usuario
+            var claimIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            inventarioVM.Inventario.UsuarioAplicacionId = claim.Value;
+            inventarioVM.Inventario.FechaInicial = DateTime.Now;
+            inventarioVM.Inventario.FechaFinal = DateTime.Now;
+            return View(inventarioVM);
+        }
+
+        public async Task<IActionResult> DetalleInventario(int id)
+        {
+            inventarioVM = new InventarioVM();
+            inventarioVM.Inventario = await _unitOfWork.Inventario
+                .GetFirstOrDefault(i=>i.Id == id,includeProperties:"Bodega"); 
+            inventarioVM.InventarioDetalles = await _unitOfWork.InventarioDetalle
+                .GetAll(d=>d.InventarioId==id,includeProperties:"Producto,Producto.Marca");//la marca está asociada al producto
+            return View(inventarioVM);
+        }
+
+
         #region API
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> NuevoInventario(InventarioVM inventarioVM)
+        {
+            if (ModelState.IsValid)
+            {
+                inventarioVM.Inventario.FechaInicial=DateTime.Now;
+                inventarioVM.Inventario.FechaFinal=DateTime.Now;
+                await _unitOfWork.Inventario.Add(inventarioVM.Inventario);
+                await _unitOfWork.Save();
+                return RedirectToAction("DetalleInventario", new {id=inventarioVM.Inventario.Id});
+            }
+            inventarioVM.BodegaList = _unitOfWork.Inventario.GetAllDropdownList("Bodega");
+            return View(inventarioVM);
+        }
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
