@@ -78,6 +78,20 @@ namespace SistemaInventario.Areas.Inventario.Controllers
             return Json(new {data=todos});
 
         }
+        [HttpGet]
+        public async Task<IActionResult>BuscarProducto(string term)
+        {
+            if (!string.IsNullOrEmpty(term))
+            {
+                var listaProductos = await _unitOfWork.Producto.GetAll(p => p.Estado == true);
+                var data = listaProductos.Where(x => 
+                    x.NumeroSerie.Contains(term, StringComparison.OrdinalIgnoreCase)|| 
+                    x.Descripcion.Contains(term, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+                return Ok(data);
+            }
+            return Ok();
+        }
         #endregion
     }
 }
