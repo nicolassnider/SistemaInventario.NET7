@@ -23,27 +23,18 @@ function loadDataTable() {
 		ajax: {
 			url: '/Inventario/Inventario/GetAll',
 		},
-		columns: [
-			{ data: 'bodega.nombre' },
-			{ data: 'producto.descripcion' },
+		"columns": [
+			{ "data": "bodega.nombre" },
+			{ "data": "producto.descripcion" },
 			{
-				data: 'producto.costo',
-				className: "text-end",
-				render: function (data) {
+				"data": "producto.costo", "className": "text-end",
+				"render": function (data) {
 					var d = data.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-					return d
+					return d;
 				}
 			},
-			{ data: 'cantidad', className:'text-end' },
-
-			{ data: 'marca.nombre' },
-			{
-				data: 'precio',
-				className: "text-end",
-				
-			},
-			
-		],
+			{ "data": "cantidad", "className": "text-end" },
+		]
 	});
 }
 

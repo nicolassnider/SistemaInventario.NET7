@@ -38,12 +38,18 @@ namespace SistemaInventario.Areas.Inventario.Controllers
             };
             inventarioVM.Inventario.Estado = false;
             //obtener id de usuario
-            var claimIdentity = (ClaimsIdentity)User.Identity;
-            var claim = claimIdentity.FindFirst(ClaimTypes.NameIdentifier);
-            inventarioVM.Inventario.UsuarioAplicacionId = claim.Value;
+            var user = obtenerUsuarioId();
+            inventarioVM.Inventario.UsuarioAplicacionId = user.Value;
             inventarioVM.Inventario.FechaInicial = DateTime.Now;
             inventarioVM.Inventario.FechaFinal = DateTime.Now;
             return View(inventarioVM);
+        }
+        
+        private Claim obtenerUsuarioId()
+        {
+            var claimIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            return claim;
         }
 
         public async Task<IActionResult> DetalleInventario(int id)
@@ -88,31 +94,41 @@ namespace SistemaInventario.Areas.Inventario.Controllers
         {
             var inventario = await _unitOfWork.Inventario.Get(id);
             var detalleLista = await _unitOfWork.InventarioDetalle.GetAll(d => d.InventarioId == id);
+            // Obtener el Id del Usuario desde la sesion
+            var claimIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimIdentity.FindFirst(ClaimTypes.NameIdentifier);
 
             foreach (var item in detalleLista)
             {
                 var bodegaProducto = new BodegaProducto();
-                bodegaProducto = await _unitOfWork.BodegaProducto
-                    .GetFirstOrDefault(b => b.ProductoId == item.ProductoId && b.BodegaID == inventario.BodegaId, isTracking: false);
-                if (inventario!=null)//el registro de stock existe , actualizar cantidad
+                bodegaProducto = await _unitOfWork.BodegaProducto.GetFirstOrDefault(b => b.ProductoId == item.ProductoId &&
+                                                                                         b.BodegaID == inventario.BodegaId);
+                if (bodegaProducto != null) //  El registro de Stock existe, hay que actualizar las cantidades
                 {
+                    await _unitOfWork.KardexInventario.RegistrarKardex(bodegaProducto.Id, "Entrada", "Registro de Inventario",
+                                                                          bodegaProducto.Cantidad, item.Cantidad, claim.Value);
                     bodegaProducto.Cantidad += item.Cantidad;
                     await _unitOfWork.Save();
+
                 }
-                else //Registro no existe, crear
+                else  // Registro de Stock no existe, hay que crearlo
                 {
-                    bodegaProducto=new BodegaProducto();
+                    bodegaProducto = new BodegaProducto();
                     bodegaProducto.BodegaID = inventario.BodegaId;
                     bodegaProducto.ProductoId = item.ProductoId;
                     bodegaProducto.Cantidad = item.Cantidad;
                     await _unitOfWork.BodegaProducto.Add(bodegaProducto);
                     await _unitOfWork.Save();
+                    await _unitOfWork.KardexInventario.RegistrarKardex(bodegaProducto.Id, "Entrada", "Inventario Inicial",
+                                                                         0, item.Cantidad, claim.Value);
                 }
+
             }
-            //actualizar cabecera
+            // Actualizar la Cabecera de Inventario
             inventario.Estado = true;
             inventario.FechaFinal = DateTime.Now;
             await _unitOfWork.Save();
+            TempData[DS.Exitosa] = "Stock Generado con Exito";
             return RedirectToAction("Index");
         }
 
