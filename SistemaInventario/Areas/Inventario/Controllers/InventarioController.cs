@@ -132,6 +132,11 @@ namespace SistemaInventario.Areas.Inventario.Controllers
             return RedirectToAction("Index");
         }
 
+        public IActionResult KardexProducto()
+        {
+            return View();
+        }
+
 
         #region API
         [HttpPost]
