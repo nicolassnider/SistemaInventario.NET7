@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Identity.Client;
 using SistemaInventario.AccesoDatos.Repositorio.IRepositorio;
+using SistemaInventario.Models;
 using SistemaInventario.Models.ViewModels;
 using SistemaInventario.Utilidades;
 using System.Security.Claims;
@@ -80,6 +82,38 @@ namespace SistemaInventario.Areas.Inventario.Controllers
             await _unitOfWork.Save();
             return RedirectToAction("DetalleInventario", new { id = inventarioVM.Inventario.Id });
 
+        }
+
+        public async Task<IActionResult>GenerarStock(int id)
+        {
+            var inventario = await _unitOfWork.Inventario.Get(id);
+            var detalleLista = await _unitOfWork.InventarioDetalle.GetAll(d => d.InventarioId == id);
+
+            foreach (var item in detalleLista)
+            {
+                var bodegaProducto = new BodegaProducto();
+                bodegaProducto = await _unitOfWork.BodegaProducto
+                    .GetFirstOrDefault(b => b.ProductoId == item.ProductoId && b.BodegaID == inventario.BodegaId, isTracking: false);
+                if (inventario!=null)//el registro de stock existe , actualizar cantidad
+                {
+                    bodegaProducto.Cantidad += item.Cantidad;
+                    await _unitOfWork.Save();
+                }
+                else //Registro no existe, crear
+                {
+                    bodegaProducto=new BodegaProducto();
+                    bodegaProducto.BodegaID = inventario.BodegaId;
+                    bodegaProducto.ProductoId = item.ProductoId;
+                    bodegaProducto.Cantidad = item.Cantidad;
+                    await _unitOfWork.BodegaProducto.Add(bodegaProducto);
+                    await _unitOfWork.Save();
+                }
+            }
+            //actualizar cabecera
+            inventario.Estado = true;
+            inventario.FechaFinal = DateTime.Now;
+            await _unitOfWork.Save();
+            return RedirectToAction("Index");
         }
 
 
