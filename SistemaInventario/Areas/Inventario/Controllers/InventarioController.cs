@@ -54,8 +54,67 @@ namespace SistemaInventario.Areas.Inventario.Controllers
             return View(inventarioVM);
         }
 
+        public async Task<IActionResult>Mas(int id) //recibe id del detalle
+        {
+            inventarioVM =new InventarioVM();
+            var detalle = await _unitOfWork.InventarioDetalle.Get(id);
+            inventarioVM.Inventario = await _unitOfWork.Inventario.Get(detalle.InventarioId);
+            detalle.Cantidad += 1;
+            await _unitOfWork.Save();
+            return RedirectToAction("DetalleInventario", new { id = inventarioVM.Inventario.Id });
+
+        }
+        public async Task<IActionResult> Menos(int id) //recibe id del detalle
+        {
+            inventarioVM = new InventarioVM();
+            var detalle = await _unitOfWork.InventarioDetalle.Get(id);
+            inventarioVM.Inventario = await _unitOfWork.Inventario.Get(detalle.InventarioId);
+            if (detalle.Cantidad==1)
+            {
+                _unitOfWork.InventarioDetalle.Remove(detalle);
+            }
+            else
+            {
+                detalle.Cantidad -= 1;
+            }
+            await _unitOfWork.Save();
+            return RedirectToAction("DetalleInventario", new { id = inventarioVM.Inventario.Id });
+
+        }
+
 
         #region API
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DetalleInventario(int InventarioId, int productoId, int cantidadId)
+        {
+            inventarioVM = new InventarioVM();
+            inventarioVM.Inventario = await _unitOfWork.Inventario.GetFirstOrDefault(i => i.Id == InventarioId);
+            var bodegaProducto = await _unitOfWork.BodegaProducto
+                .GetFirstOrDefault(b => b.BodegaID == inventarioVM.Inventario.BodegaId && b.ProductoId == productoId);
+            var detalle = await _unitOfWork.InventarioDetalle
+                .GetFirstOrDefault(d=>d.InventarioId == InventarioId && d.ProductoId==productoId);
+
+            if (detalle==null)
+            {
+                inventarioVM.InventarioDetalle = new Models.InventarioDetalle();
+                inventarioVM.InventarioDetalle.ProductoId = productoId;
+                inventarioVM.InventarioDetalle.InventarioId = InventarioId;
+                if (bodegaProducto!=null)
+                {
+                    inventarioVM.InventarioDetalle.StockAnterior = bodegaProducto.Cantidad;
+                }
+                else
+                {
+                    inventarioVM.InventarioDetalle.StockAnterior = 0;
+                }
+                inventarioVM.InventarioDetalle.Cantidad = cantidadId;
+                await _unitOfWork.InventarioDetalle.Add(inventarioVM.InventarioDetalle);
+                await _unitOfWork.Save();
+            }
+            return RedirectToAction("DetalleInventario", new {id=InventarioId});
+
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> NuevoInventario(InventarioVM inventarioVM)

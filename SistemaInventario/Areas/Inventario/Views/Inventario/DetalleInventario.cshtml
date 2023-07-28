@@ -42,7 +42,53 @@
         </div>
         
     </form>    
-    
+    <table class="table table-striped border">
+        <thead class="thead-dark">
+            <tr class="table-secondary thead-dark">
+                <td>Producto</td>
+                <td>Marca</td>
+                <td>Costo</td>
+                <td>Stock</td>
+                <td>Cantidad</td>
+                <td>Acciones</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var i in Model.InventarioDetalles)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(d=>i.Producto.Descripcion)</td>
+                
+                    <td>@Html.DisplayFor(d=>i.Producto.Marca.Descripcion)</td>
+                
+                    <td>@Html.DisplayFor(d=>i.Producto.Costo)</td>
+                
+                    <td>@Html.DisplayFor(d=>i.StockAnterior)</td>
+                
+                    <td>@Html.DisplayFor(d=>i.Cantidad)</td>
+                
+                    <td>@Html.DisplayFor(d=>i.Producto.Descripcion)</td>
+
+                    <td>
+                        <a class="btn btn-primary text-white" asp-action="Mas" asp-route-id="@i.Id">
+                            <i class="bi bi-file-plus-fill"></i>
+                        </a>
+                        <a class="btn btn-primary text-white" asp-action="Menos" asp-route-id="@i.Id">
+                            <i class="bi bi-file-minus-fill"></i>
+                        </a>
+                        <a></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @if (Model.InventarioDetalles.Count()>0){
+        <div class="col-2">
+            <a asp-action="GenerarStock" class="btn btn-warning form-control" asp-route-id="@Model.Inventario.Id">
+                Generar stock
+            </a>
+        </div>
+    }
 </div>
 
 @section Scripts{
@@ -74,6 +120,22 @@
                 }
             
         })
+    </script>
+    <script>
+        $("#btnAgregar").click(
+            function () {
+                let cantidad = document.getElementById('cantidadId').value;
+                console.log(cantidad);
+                let producto = document.getElementById('productoId').value;
+                if (cantidad.toString() == '' || cantidad < 1) {
+                    swal('Error', 'Ingrese una cantidad', 'error');
+                    return false;
+                }
+                if (producto.toString() == '') {
+                    swal('Error', 'Seleccione un producto', 'error')
+                    return false;
+                }
+            });
     </script>
 }
 
