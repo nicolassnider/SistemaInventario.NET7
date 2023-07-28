@@ -11,7 +11,7 @@ using System.Security.Claims;
 namespace SistemaInventario.Areas.Inventario.Controllers
 {
     [Area("Inventario")]
-    [Authorize(Roles= DS.Role_Inventario+","+DS.Role_Admin)]
+    [Authorize(Roles = DS.Role_Inventario + "," + DS.Role_Admin)]
     public class InventarioController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -32,7 +32,7 @@ namespace SistemaInventario.Areas.Inventario.Controllers
         {
             inventarioVM = new InventarioVM()
             {
-                Inventario= new Models.Inventario(), //genera conflictos por repetir el nombre
+                Inventario = new Models.Inventario(), //genera conflictos por repetir el nombre
                 BodegaList = _unitOfWork.Inventario.GetAllDropdownList("Bodega"),
                 //no es necesario completar todos las propiedades
             };
@@ -44,7 +44,7 @@ namespace SistemaInventario.Areas.Inventario.Controllers
             inventarioVM.Inventario.FechaFinal = DateTime.Now;
             return View(inventarioVM);
         }
-        
+
         private Claim obtenerUsuarioId()
         {
             var claimIdentity = (ClaimsIdentity)User.Identity;
@@ -56,15 +56,15 @@ namespace SistemaInventario.Areas.Inventario.Controllers
         {
             inventarioVM = new InventarioVM();
             inventarioVM.Inventario = await _unitOfWork.Inventario
-                .GetFirstOrDefault(i=>i.Id == id,includeProperties:"Bodega"); 
+                .GetFirstOrDefault(i => i.Id == id, includeProperties: "Bodega");
             inventarioVM.InventarioDetalles = await _unitOfWork.InventarioDetalle
-                .GetAll(d=>d.InventarioId==id,includeProperties:"Producto,Producto.Marca");//la marca está asociada al producto
+                .GetAll(d => d.InventarioId == id, includeProperties: "Producto,Producto.Marca");//la marca está asociada al producto
             return View(inventarioVM);
         }
 
-        public async Task<IActionResult>Mas(int id) //recibe id del detalle
+        public async Task<IActionResult> Mas(int id) //recibe id del detalle
         {
-            inventarioVM =new InventarioVM();
+            inventarioVM = new InventarioVM();
             var detalle = await _unitOfWork.InventarioDetalle.Get(id);
             inventarioVM.Inventario = await _unitOfWork.Inventario.Get(detalle.InventarioId);
             detalle.Cantidad += 1;
@@ -77,7 +77,7 @@ namespace SistemaInventario.Areas.Inventario.Controllers
             inventarioVM = new InventarioVM();
             var detalle = await _unitOfWork.InventarioDetalle.Get(id);
             inventarioVM.Inventario = await _unitOfWork.Inventario.Get(detalle.InventarioId);
-            if (detalle.Cantidad==1)
+            if (detalle.Cantidad == 1)
             {
                 _unitOfWork.InventarioDetalle.Remove(detalle);
             }
@@ -90,7 +90,7 @@ namespace SistemaInventario.Areas.Inventario.Controllers
 
         }
 
-        public async Task<IActionResult>GenerarStock(int id)
+        public async Task<IActionResult> GenerarStock(int id)
         {
             var inventario = await _unitOfWork.Inventario.Get(id);
             var detalleLista = await _unitOfWork.InventarioDetalle.GetAll(d => d.InventarioId == id);
@@ -136,9 +136,31 @@ namespace SistemaInventario.Areas.Inventario.Controllers
         {
             return View();
         }
+        public async Task<IActionResult> KardexProductoResultado (string fechaInicioId, string fechaFinalId, int productoId)
+        {
+            KardexInventarioVM kardexInventarioVM = new KardexInventarioVM();
+            kardexInventarioVM.Producto = new Producto();
+            kardexInventarioVM.Producto = await _unitOfWork.Producto.GetFirstOrDefault(p => p.Id == productoId);
+            kardexInventarioVM.FechaInicio = DateTime.Parse(fechaInicioId); //00
+            kardexInventarioVM.FechaFinal=DateTime.Parse(fechaFinalId).AddHours(23).AddMinutes(59);
+            kardexInventarioVM.KardexInventarioLista = 
+                await _unitOfWork.KardexInventario.GetAll(k=>
+                k.BodegaProducto.ProductoId==productoId && 
+               (k.FechaRegistro>=kardexInventarioVM.FechaInicio) &&
+               (k.FechaRegistro<=kardexInventarioVM.FechaFinal),
+                includeProperties:"BodegaProducto,BodegaProducto.Producto,BodegaProducto.Bodega",
+                orderBy:o=>o.OrderBy(o=>o.FechaRegistro));
+            return View(kardexInventarioVM);
+        }
 
 
         #region API
+        [HttpPost]
+        public IActionResult KardexInventario(string fechaInicioId, string fechaFinalId, int productoId) //marca como string las fechas
+        {
+            return RedirectToAction("KardexProductoResultado", new { fechaInicioId, fechaFinalId, productoId });
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DetalleInventario(int InventarioId, int productoId, int cantidadId)
