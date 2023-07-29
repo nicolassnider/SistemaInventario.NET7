@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SistemaInventario.AccesoDatos.Repositorio.IRepositorio;
 using SistemaInventario.Models;
 using SistemaInventario.Utilidades;

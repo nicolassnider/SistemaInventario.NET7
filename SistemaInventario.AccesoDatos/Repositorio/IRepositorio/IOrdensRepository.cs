@@ -2,9 +2,8 @@
 
 namespace SistemaInventario.AccesoDatos.Repositorio.IRepositorio
 {
-    public interface IBodegaRepository:IRepository<Bodega>
+    public interface IOrdenRepository:IRepository<Orden>
     {
-        void Update(Bodega bodega);
-
+        void Update(Orden orden);
     }
 }

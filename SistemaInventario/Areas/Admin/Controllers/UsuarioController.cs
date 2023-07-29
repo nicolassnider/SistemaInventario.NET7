@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using SistemaInventario.AccesoDatos.Data;
 using SistemaInventario.AccesoDatos.Repositorio.IRepositorio;
 using SistemaInventario.Utilidades;
-using System.Data;
 
 namespace SistemaInventario.Areas.Admin.Controllers
 {
