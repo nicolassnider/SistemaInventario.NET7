@@ -9,11 +9,11 @@ namespace SistemaInventario.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles =DS.Role_Admin)]
-    public class CompanyController : Controller
+    public class CompaniaController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public CompanyController(IUnitOfWork unitOfWork)
+        public CompaniaController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
@@ -25,6 +25,10 @@ namespace SistemaInventario.Areas.Admin.Controllers
                 BodegaLista = _unitOfWork.Compania.GetAllDropdownList("Bodega"),
             };
             companiaVM.Compania = await _unitOfWork.Compania.GetFirstOrDefault();
+            if (companiaVM.Compania==null)
+            {
+                companiaVM.Compania = new Models.Compania();
+            }
             return View(companiaVM);
 
         }
@@ -39,7 +43,7 @@ namespace SistemaInventario.Areas.Admin.Controllers
                 var claimIdentity = (ClaimsIdentity)User.Identity;
                 var claim = claimIdentity.FindFirst(ClaimTypes.NameIdentifier);
 
-                if (companiaVM.Compania.Id == null)
+                if (companiaVM.Compania.Id == 0)
                 {
                     //crear compañía
                     companiaVM.Compania.CreadoPorId = claim.Value;
@@ -55,7 +59,7 @@ namespace SistemaInventario.Areas.Admin.Controllers
                     companiaVM.Compania.FechaActualizacion = DateTime.Now;
                 }
                 await _unitOfWork.Save();
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Home", new {area="Inventario"});
             }
             TempData[DS.Error] = "Error al grabar";
             return View(companiaVM);
