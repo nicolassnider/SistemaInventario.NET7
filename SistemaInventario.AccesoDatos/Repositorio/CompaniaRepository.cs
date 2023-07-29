@@ -1,4 +1,5 @@
-﻿using SistemaInventario.AccesoDatos.Data;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using SistemaInventario.AccesoDatos.Data;
 using SistemaInventario.AccesoDatos.Repositorio.IRepositorio;
 using SistemaInventario.Models;
 
@@ -11,6 +12,14 @@ namespace SistemaInventario.AccesoDatos.Repositorio
         public CompaniaRepository(ApplicationDbContext db):base(db)
         {
             _db = db;
+        }
+        public IEnumerable<SelectListItem> GetAllDropdownList(string obj)
+        {
+            if (obj == "Bodega")
+            {
+                return _db.Bodegas.Where(b => b.Estado == true).Select(b => new SelectListItem { Text = b.Nombre, Value = b.Id.ToString() });
+            }
+            return null;
         }
 
         public void Update(Compania compania)
