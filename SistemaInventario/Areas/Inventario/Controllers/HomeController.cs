@@ -79,7 +79,7 @@ namespace SistemaInventario.Areas.Inventario.Controllers
             carroComprasVM.CarroCompras = new CarroCompras()
             {
                 Producto = carroComprasVM.Producto,
-                ProductId = carroComprasVM.Producto.Id
+                ProductoId = carroComprasVM.Producto.Id
             };
             return View(carroComprasVM);
         }

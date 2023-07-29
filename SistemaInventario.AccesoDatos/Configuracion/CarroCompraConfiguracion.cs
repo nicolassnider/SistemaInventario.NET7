@@ -10,7 +10,7 @@ namespace SistemaInventario.AccesoDatos.Configuracion
         {
             builder.Property(x => x.Id).IsRequired();
             builder.Property(x => x.UsuarioAplicacionId).IsRequired();
-            builder.Property(x => x.ProductId).IsRequired();
+            builder.Property(x => x.ProductoId).IsRequired();
             builder.Property(x => x.Cantidad).IsRequired();
             //el precio no se graba en la tabla
 
@@ -19,7 +19,7 @@ namespace SistemaInventario.AccesoDatos.Configuracion
                 .HasForeignKey(x => x.UsuarioAplicacionId)
                 .OnDelete(DeleteBehavior.NoAction);
             builder.HasOne(x => x.Producto).WithMany()
-                .HasForeignKey(x => x.ProductId)
+                .HasForeignKey(x => x.ProductoId)
                 .OnDelete(DeleteBehavior.NoAction);
 
         }
