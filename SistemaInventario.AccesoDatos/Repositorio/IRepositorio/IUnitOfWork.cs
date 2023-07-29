@@ -13,6 +13,8 @@
         IKardexInventarioRepository KardexInventario { get; }
         ICompaniaRepository Compania { get; }
         ICarroComprasRepository CarroCompras { get; }
+        IOrdenRepository Orden { get; }
+
         Task Save();
     }
 }

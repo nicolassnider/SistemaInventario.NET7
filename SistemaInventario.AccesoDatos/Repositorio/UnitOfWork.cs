@@ -17,6 +17,7 @@ namespace SistemaInventario.AccesoDatos.Repositorio
         public IKardexInventarioRepository KardexInventario { get; private set; }
         public ICompaniaRepository Compania { get; private set; }
         public ICarroComprasRepository CarroCompras { get; private set; }
+        public IOrdenRepository Orden { get; private set; }
         public UnitOfWork(ApplicationDbContext db)
         {
             _db = db;
@@ -31,6 +32,7 @@ namespace SistemaInventario.AccesoDatos.Repositorio
             KardexInventario = new KardexInventarioRepository(_db);
             Compania = new CompaniaRepository(_db);
             CarroCompras = new CarroComprasRepository(_db);
+            Orden = new OrdenRepository(_db);
             
         }        
 
