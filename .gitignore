@@ -365,3 +365,5 @@ FodyWeavers.xsd
 # excluir nuevos archivos de imágenes subidas
 /SistemaInventario/wwwroot/img/producto/*
 /SistemaInventario/appsettings.json
+/SistemaInventario/wwwroot/lib/select2/*
+/SistemaInventario/wwwroot/lib/select2-bootstrap-5-theme/*
