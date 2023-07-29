@@ -12,6 +12,7 @@
         IInventarioDetalleRepository InventarioDetalle { get; }
         IKardexInventarioRepository KardexInventario { get; }
         ICompaniaRepository Compania { get; }
+        ICarroComprasRepository CarroCompras { get; }
         Task Save();
     }
 }
