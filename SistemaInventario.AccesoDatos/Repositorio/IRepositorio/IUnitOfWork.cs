@@ -14,6 +14,7 @@
         ICompaniaRepository Compania { get; }
         ICarroComprasRepository CarroCompras { get; }
         IOrdenRepository Orden { get; }
+        IOrdenDetalleRepository OrdenDetalle { get; }
 
         Task Save();
     }
