@@ -156,7 +156,7 @@ namespace SistemaInventario.Areas.Inventario.Controllers
 
         #region API
         [HttpPost]
-        public IActionResult KardexInventario(string fechaInicioId, string fechaFinalId, int productoId) //marca como string las fechas
+        public IActionResult KardexProducto(string fechaInicioId, string fechaFinalId, int productoId) //marca como string las fechas
         {
             return RedirectToAction("KardexProductoResultado", new { fechaInicioId, fechaFinalId, productoId });
         }
