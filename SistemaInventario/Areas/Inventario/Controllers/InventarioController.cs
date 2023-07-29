@@ -154,13 +154,13 @@ namespace SistemaInventario.Areas.Inventario.Controllers
             return View(kardexInventarioVM);
         }
 
-        public async Task<IActionResult> ImprimirKardex(DateTime fechaInicioId, DateTime fechaFinalId, int productoId)
+        public async Task<IActionResult> ImprimirKardex(DateTime fechaInicio, DateTime fechaFinal, int productoId)
         {
             KardexInventarioVM kardexInventarioVM = new KardexInventarioVM();
             kardexInventarioVM.Producto = new Producto();
             kardexInventarioVM.Producto = await _unitOfWork.Producto.GetFirstOrDefault(p => p.Id == productoId);
-            kardexInventarioVM.FechaInicio = fechaInicioId; //00
-            kardexInventarioVM.FechaFinal = fechaFinalId;
+            kardexInventarioVM.FechaInicio = fechaInicio; //00
+            kardexInventarioVM.FechaFinal = fechaFinal;
             kardexInventarioVM.KardexInventarioLista =
                 await _unitOfWork.KardexInventario.GetAll(k =>
                 k.BodegaProducto.ProductoId == productoId &&
