@@ -13,27 +13,29 @@ namespace SistemaInventario.AccesoDatos.Configuracion
     {
         public void Configure(EntityTypeBuilder<Compania> builder)
         {
-            builder.Property(x=>x.Id).IsRequired();
+            builder.Property(x => x.Id).IsRequired();
             builder.Property(x => x.Nombre).IsRequired().HasMaxLength(60);
             builder.Property(x => x.Descripcion).IsRequired().HasMaxLength(100);
-            builder.Property(x => x.Pais).IsRequired().HasMaxLength(60);
-            builder.Property(x => x.Ciudad).IsRequired().HasMaxLength(60);
+            builder.Property(x => x.Pais).IsRequired();
+            builder.Property(x => x.Ciudad).IsRequired().HasMaxLength(60); ;
             builder.Property(x => x.Direccion).IsRequired().HasMaxLength(100);
             builder.Property(x => x.Telefono).IsRequired().HasMaxLength(40);
+            builder.Property(x => x.BodegaVentaId).IsRequired();
             builder.Property(x => x.CreadoPorId).IsRequired(false);
-            builder.Property(x => x.ActualizadoPor).IsRequired(false);
-
+            builder.Property(x => x.ActualizadoPorId).IsRequired(false);
             //relaciones
 
             builder.HasOne(x => x.Bodega).WithMany()
-                .HasForeignKey(x => x.BodegaVentaId)
-                .OnDelete(DeleteBehavior.NoAction);
+                   .HasForeignKey(x => x.BodegaVentaId)
+                   .OnDelete(DeleteBehavior.NoAction);
+
             builder.HasOne(x => x.CreadoPor).WithMany()
-                .HasForeignKey(x => x.CreadoPorId)
-                .OnDelete(DeleteBehavior.NoAction);
+                   .HasForeignKey(x => x.CreadoPorId)
+                   .OnDelete(DeleteBehavior.NoAction);
+
             builder.HasOne(x => x.ActualizadoPor).WithMany()
-                .HasForeignKey(x => x.ActualizadoPorId)
-                .OnDelete(DeleteBehavior.NoAction);
+                  .HasForeignKey(x => x.ActualizadoPorId)
+                  .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
