@@ -1,10 +1,5 @@
 ﻿using SistemaInventario.AccesoDatos.Data;
 using SistemaInventario.AccesoDatos.Repositorio.IRepositorio;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SistemaInventario.AccesoDatos.Repositorio
 {
@@ -20,7 +15,7 @@ namespace SistemaInventario.AccesoDatos.Repositorio
         public IInventarioRepository Inventario { get; private set; }
         public IInventarioDetalleRepository InventarioDetalle { get; private set; }
         public IKardexInventarioRepository KardexInventario { get; private set; }
-       
+        public ICompaniaRepository Compania { get; private set; }
         public UnitOfWork(ApplicationDbContext db)
         {
             _db = db;
@@ -33,6 +28,7 @@ namespace SistemaInventario.AccesoDatos.Repositorio
             Inventario = new InventarioRepository(_db);
             InventarioDetalle = new InventarioDetalleRepository(_db);
             KardexInventario = new KardexInventarioRepository(_db);
+            Compania = new CompaniaRepository(_db);
             
         }        
 

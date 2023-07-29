@@ -1,11 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using SistemaInventario.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace SistemaInventario.AccesoDatos.Repositorio.IRepositorio
 {
-    public interface IProductoRepository : IRepository<Producto>
+    public interface ICompaniaRepository:IRepository<Compania>
     {
-        void Update(Producto producto);
+        void Update(Compania compania);
         IEnumerable<SelectListItem> GetAllDropdownList(string obj);
     }
 }

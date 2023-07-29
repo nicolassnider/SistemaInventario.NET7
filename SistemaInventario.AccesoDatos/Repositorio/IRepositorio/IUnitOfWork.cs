@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SistemaInventario.AccesoDatos.Repositorio.IRepositorio
+﻿namespace SistemaInventario.AccesoDatos.Repositorio.IRepositorio
 {
     public interface IUnitOfWork : IDisposable
     {
@@ -17,6 +11,7 @@ namespace SistemaInventario.AccesoDatos.Repositorio.IRepositorio
         IInventarioRepository Inventario {get;}
         IInventarioDetalleRepository InventarioDetalle { get; }
         IKardexInventarioRepository KardexInventario { get; }
+        ICompaniaRepository Compania { get; }
         Task Save();
     }
 }
