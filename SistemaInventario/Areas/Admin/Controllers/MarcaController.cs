@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using SistemaInventario.AccesoDatos.Repositorio.IRepositorio;
 using SistemaInventario.Models;
 using SistemaInventario.Utilidades;
-using System.Data;
 
 namespace SistemaInventario.Areas.Admin.Controllers
 {
