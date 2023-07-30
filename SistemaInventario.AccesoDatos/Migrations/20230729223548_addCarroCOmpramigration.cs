@@ -38,7 +38,7 @@ namespace SistemaInventario.AccesoDatos.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_CarrosCompras_ProductId",
                 table: "CarrosCompras",
-                column: "ProductId");
+                column: "ProductoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CarrosCompras_UsuarioAplicacionId",

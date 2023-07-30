@@ -38,6 +38,13 @@ builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();//Se agr
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddRazorPages();//paginas de razor
 builder.Services.AddSingleton<IEmailSender,EmailSender>();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);//duración de la sesion
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+
+});
 
 var app = builder.Build();
 
@@ -57,6 +64,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();

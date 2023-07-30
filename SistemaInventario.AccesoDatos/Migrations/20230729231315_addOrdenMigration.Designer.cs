@@ -294,7 +294,7 @@ namespace SistemaInventario.AccesoDatos.Migrations
                     b.Property<int>("Cantidad")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductId")
+                    b.Property<int>("ProductoId")
                         .HasColumnType("int");
 
                     b.Property<string>("UsuarioAplicacionId")
@@ -303,7 +303,7 @@ namespace SistemaInventario.AccesoDatos.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("ProductoId");
 
                     b.HasIndex("UsuarioAplicacionId");
 
@@ -765,7 +765,7 @@ namespace SistemaInventario.AccesoDatos.Migrations
                 {
                     b.HasOne("SistemaInventario.Models.Producto", "Producto")
                         .WithMany()
-                        .HasForeignKey("ProductId")
+                        .HasForeignKey("ProductoId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
