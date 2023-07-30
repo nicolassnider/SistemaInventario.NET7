@@ -174,12 +174,14 @@ namespace SistemaInventario.Areas.Inventario.Controllers
                 await _unitOfWork.Save();
             }
             //stripe
+            var user = await _unitOfWork.UsuarioAplicacion.GetFirstOrDefault(u => u.Id == claim.Value);
             var options = new SessionCreateOptions
             {
-                SuccessUrl=_webUrl+$"inventario/carroCompras/OrdenConfirmacion?id-{carroComprasVM.Orden.Id}",
+                SuccessUrl=_webUrl+$"inventario/carroCompras/OrdenConfirmacion?id={carroComprasVM.Orden.Id}",
                 CancelUrl= _webUrl+"inventario/carroCompras/index",
                 LineItems = new List<SessionLineItemOptions>(),
-                Mode="payment"
+                Mode="payment",
+                CustomerEmail=user.Email
             };
             foreach (var lista in carroComprasVM.CarroCompraLista)
             {
@@ -205,8 +207,7 @@ namespace SistemaInventario.Areas.Inventario.Controllers
             await _unitOfWork.Save();
             Response.Headers.Add("Location", session.Url);//redireccion a stripe
             return new StatusCodeResult(StatusCodes.Status303SeeOther);
-            return RedirectToAction("OrdenConfirmacion",new {id=carroComprasVM.Orden.Id});
-
+           
         }
         public async Task<IActionResult>OrdenConfirmacion(int id)
         {
@@ -215,15 +216,35 @@ namespace SistemaInventario.Areas.Inventario.Controllers
                                       includeProperties:"UsuarioAplicacion");
             var service = new SessionService();
             Session session = service.Get(orden.SessionId);
+            var carroCompra = await _unitOfWork.CarroCompras
+                .GetAll(u => u.UsuarioAplicacionId == orden.UsuarioAplicacionId);
             if (session.PaymentStatus.ToLower()=="paid")
             {
                 _unitOfWork.Orden.UpdatePagoStripeId(id, session.Id, session.PaymentIntentId);
                 _unitOfWork.Orden.UpdateEstado(id, DS.EstadoAprobado, DS.PagoEstadoAprobado);
                 await _unitOfWork.Save();
+                //disminuir stock de la bodega de venta
+                var compania = await _unitOfWork.Compania.GetFirstOrDefault();
+                foreach(var lista in carroCompra)
+                {
+                    var bodegaProducto = new BodegaProducto();
+                    bodegaProducto = await _unitOfWork.BodegaProducto
+                        .GetFirstOrDefault(b=>b.ProductoId==lista.ProductoId &&
+                                              b.BodegaID==compania.BodegaVentaId);
+
+                    await _unitOfWork.KardexInventario
+                        .RegistrarKardex(bodegaProducto.Id, 
+                                         DS.Tipo_Salida, 
+                                         "Venta - Orden#" + id,
+                                         bodegaProducto.Cantidad, 
+                                         lista.Cantidad, 
+                                         orden.UsuarioAplicacionId);
+                    bodegaProducto.Cantidad -= lista.Cantidad;
+                    await _unitOfWork.Save();
+                }
             }
             //borrar carro y la sesion del caarro
-            var carroCompra = await _unitOfWork.CarroCompras
-                .GetAll(u=>u.UsuarioAplicacionId==orden.UsuarioAplicacionId);
+            
             List<CarroCompras> carroComprasLista = carroCompra.ToList();
             _unitOfWork.CarroCompras.RemoveRange(carroComprasLista);
             await _unitOfWork.Save();
