@@ -14,10 +14,10 @@ namespace SistemaInventario.Models
         public int Id { get; set; }
         [Required]
         public string UsuarioAplicacionId { get; set; }
-        [ForeignKey("UsuarioAplicacionId")]
+        [ForeignKey( "UsuarioAplicacionId")]
         public UsuarioAplicacion UsuarioAplicacion { get; set; }
         [Required]
-        public int ProductoId { get; set; }
+        public int   ProductoId { get; set; }
         [ForeignKey("ProductoId")]
         public Producto Producto { get; set; }
         [Required]

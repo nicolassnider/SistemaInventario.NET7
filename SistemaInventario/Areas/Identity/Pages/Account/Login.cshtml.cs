@@ -119,8 +119,8 @@ namespace SistemaInventario.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    var user =await _unitOfWork.UsuarioAplicacion.GetFirstOrDefault(u=>u.UserName == Input.Email);
-                    var carroLista = await _unitOfWork.CarroCompras.GetAll(c => c.UsuarioAplicacionId == user.Id);
+                    var usuario = await _unitOfWork.UsuarioAplicacion.GetFirstOrDefault(u => u.UserName == Input.Email);
+                    var carroLista = await _unitOfWork.CarroCompras.GetAll(c => c.UsuarioAplicacionId == usuario.Id);
                     var numeroProductos = carroLista.Count();
                     HttpContext.Session.SetInt32(DS.ssCarroCompras, numeroProductos);
                     _logger.LogInformation("User logged in.");
