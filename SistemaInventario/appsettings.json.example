@@ -17,5 +17,8 @@
   "Stripe": {
     "SecretKey": "SecretKey",
     "PublishableKey": "PublishableKey"
+  },
+  "DomainUrls": {
+    "WEB_URL": "https://localhost:7229/"
   }
 }

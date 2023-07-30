@@ -11,13 +11,16 @@ namespace SistemaInventario.Areas.Inventario.Controllers
     [Area("Inventario")]
     public class CarroComprasController : Controller
     {
+        
         private readonly IUnitOfWork _unitOfWork;
+        private string _webUrl;
         [BindProperty]
         public CarroComprasVM carroComprasVM { get; set; }
 
-        public CarroComprasController(IUnitOfWork unitOfWork)
+        public CarroComprasController(IUnitOfWork unitOfWork, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
+            _webUrl = configuration.GetValue<string>("DomainUrls:WEB_URL");
         }
         [Authorize]
         public async Task<IActionResult> Index()
