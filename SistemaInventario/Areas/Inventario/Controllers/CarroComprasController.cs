@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SistemaInventario.AccesoDatos.Repositorio.IRepositorio;
 using SistemaInventario.Models.ViewModels;
 using System.Security.Claims;
@@ -16,7 +17,7 @@ namespace SistemaInventario.Areas.Inventario.Controllers
         {
             _unitOfWork = unitOfWork;
         }
-
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             var claim = obtenerUsuarioId();
