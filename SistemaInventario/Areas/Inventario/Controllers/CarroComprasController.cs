@@ -124,6 +124,62 @@ namespace SistemaInventario.Areas.Inventario.Controllers
             }
             return View(carroComprasVM);
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Proceder(CarroComprasVM carroComprasVM)
+        {
+            var claim = obtenerUsuarioId();
+            carroComprasVM.CarroCompraLista = await _unitOfWork.CarroCompras
+                .GetAll(c => c.UsuarioAplicacionId == claim.Value,
+                           includeProperties: "Producto");
+            carroComprasVM.Compania = await _unitOfWork.Compania.GetFirstOrDefault();
+            carroComprasVM.Orden.TotalOrden = 0;
+            carroComprasVM.Orden.UsuarioAplicacionId= claim.Value;
+            carroComprasVM.Orden.FechaOrden = DateTime.Now;
+            foreach (var lista in carroComprasVM.CarroCompraLista)
+            {
+                lista.Precio = lista.Producto.Precio;
+                carroComprasVM.Orden.TotalOrden += (lista.Precio + lista.Cantidad);
+            }
+            //control stock
+            foreach (var lista in carroComprasVM.CarroCompraLista)
+            {
+                //capturar stock de c/ producto
+                var producto = await _unitOfWork.BodegaProducto
+                    .GetFirstOrDefault(b => b.ProductoId == lista.ProductoId &&
+                                       b.BodegaID == carroComprasVM.Compania.BodegaVentaId);
+                if (lista.Cantidad > producto.Cantidad)
+                {
+                    TempData[DS.Error] = $"Cantidad de producto {lista.Producto.Descripcion} excede el stock actual ({producto.Cantidad})";
+                    return RedirectToAction("Index");
+                }
+            }
+            carroComprasVM.Orden.EstadoOrden = DS.EstadoPendiente;
+            carroComprasVM.Orden.EstadoPago = DS.PagoEstadoPendiente;
+            await _unitOfWork.Orden.Add(carroComprasVM.Orden);
+            await _unitOfWork.Save();
+            //guardar detalle orden
+
+            foreach (var lista in carroComprasVM.CarroCompraLista)
+            {
+                OrdenDetalle ordenDetalle = new OrdenDetalle()
+                {
+                    ProductoId = lista.ProductoId,
+                    OrdenId = carroComprasVM.Orden.Id,
+                    Precio = lista.Precio,
+                    Cantidad = lista.Cantidad
+                };
+                await _unitOfWork.OrdenDetalle.Add(ordenDetalle);
+                await _unitOfWork.Save();
+            }
+            //stripe
+            return RedirectToAction("OrdenConfirmacion",new {id=carroComprasVM.Orden.Id});
+
+        }
+        public async Task<IActionResult>OrdenConfirmacion(int id)
+        {
+            return View();
+        }
 
         private Claim obtenerUsuarioId()
         {
