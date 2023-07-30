@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SistemaInventario.AccesoDatos.Repositorio.IRepositorio;
+using SistemaInventario.Models;
 using SistemaInventario.Models.ViewModels;
+using SistemaInventario.Utilidades;
 using System.Security.Claims;
 
 namespace SistemaInventario.Areas.Inventario.Controllers
@@ -34,6 +36,47 @@ namespace SistemaInventario.Areas.Inventario.Controllers
                 carroComprasVM.Orden.TotalOrden += (lista.Precio * lista.Cantidad);
             }
             return View(carroComprasVM);
+        }
+
+        public async Task<IActionResult> mas(int carroId)
+        {
+            var carroCompras = await _unitOfWork.CarroCompras.GetFirstOrDefault(c => c.Id == carroId);
+            carroCompras.Cantidad = +1;
+            await _unitOfWork.Save();
+            return RedirectToAction("Index");
+        }
+        public async Task<IActionResult> menos(int carroId)
+        {
+            var carroCompras = await _unitOfWork.CarroCompras.GetFirstOrDefault(c => c.Id == carroId);
+            if (carroCompras.Cantidad == 1)
+            {
+                //remover registro del carro de compra y actualizar sesion
+                var carroLista = await _unitOfWork.CarroCompras
+                    .GetAll(c => c.UsuarioAplicacionId == carroCompras.UsuarioAplicacionId);
+                var numeroProductos = carroLista.Count();
+                _unitOfWork.CarroCompras.Remove(carroCompras);
+                HttpContext.Session.SetInt32(DS.ssCarroCompras, numeroProductos - 1);
+            }
+            else
+            {
+                carroCompras.Cantidad -= 1;
+                await _unitOfWork.Save();
+            }
+            
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> remover(int carroId)
+        {
+            //remueve registro del carro de compras y actualiza la sesión
+            var carroCompras = await _unitOfWork.CarroCompras.GetFirstOrDefault(c => c.Id == carroId);
+            var carroLista = await _unitOfWork.CarroCompras
+                    .GetAll(c => c.UsuarioAplicacionId == carroCompras.UsuarioAplicacionId);
+            var numeroProductos = carroLista.Count();
+            _unitOfWork.CarroCompras.Remove(carroCompras);
+            await _unitOfWork.Save();
+            HttpContext.Session.SetInt32(DS.ssCarroCompras, numeroProductos - 1);
+            return RedirectToAction("Index");
         }
 
         private Claim obtenerUsuarioId()
