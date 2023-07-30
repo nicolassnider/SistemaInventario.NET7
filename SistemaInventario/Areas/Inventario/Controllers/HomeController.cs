@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SistemaInventario.AccesoDatos.Repositorio.IRepositorio;
 using SistemaInventario.Models;
 using SistemaInventario.Models.ErrorViewModels;
 using SistemaInventario.Models.Especificaciones;
 using SistemaInventario.Models.ViewModels;
+using SistemaInventario.Utilidades;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace SistemaInventario.Areas.Inventario.Controllers
 {
@@ -82,6 +85,37 @@ namespace SistemaInventario.Areas.Inventario.Controllers
                 ProductoId = carroComprasVM.Producto.Id
             };
             return View(carroComprasVM);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> Detalle(CarroComprasVM carroComprasVM)
+        {
+            var claim = obtenerUsuarioId();
+            carroComprasVM.CarroCompras.UsuarioAplicacionId = claim.Value;
+            CarroCompras carroDB = await _unitOfWork.CarroCompras
+                .GetFirstOrDefault(c => c.UsuarioAplicacionId == claim.Value &&
+                                   c.ProductoId==carroComprasVM.CarroCompras.ProductoId);
+
+            if (carroDB == null)
+            {
+                await _unitOfWork.CarroCompras.Add(carroComprasVM.CarroCompras);
+            }
+            else
+            {
+                carroDB.Cantidad += carroComprasVM.CarroCompras.Cantidad;
+                _unitOfWork.CarroCompras.Update(carroDB);
+            }
+            await _unitOfWork.Save();
+            TempData[DS.Exitosa] = "Producto agregado a carrito";
+            return RedirectToAction("Index");
+        }
+
+        private Claim obtenerUsuarioId()
+        {
+            var claimIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            return claim;
         }
 
         public IActionResult Privacy()
