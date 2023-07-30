@@ -13,5 +13,9 @@
   "SendGrid": {
     "SecretKey": "SendGridKey",
     "EmailFrom": "example@mail.com"
+  },
+  "Stripe": {
+    "SecretKey": "SecretKey",
+    "PublishableKey": "PublishableKey"
   }
 }
