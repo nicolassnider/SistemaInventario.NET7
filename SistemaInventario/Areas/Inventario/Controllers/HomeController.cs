@@ -68,7 +68,7 @@ namespace SistemaInventario.Areas.Inventario.Controllers
             var bodegaProducto = await _unitOfWork.BodegaProducto
                 .GetFirstOrDefault(b=>b.ProductoId==id && 
                                    b.BodegaID==carroComprasVM.Compania.BodegaVentaId);
-            if (bodegaProducto != null)
+            if (bodegaProducto == null)
             {
                 carroComprasVM.Stock = 0;
             }
