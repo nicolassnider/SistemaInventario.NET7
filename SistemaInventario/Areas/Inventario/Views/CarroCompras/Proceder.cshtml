@@ -110,36 +110,39 @@
 
     </div>
 </form>
+@section Scripts{
+    <script>
+        $('#procederId').click(function () {
+            let nombresId = document.getElementById('nombresId').value;
+            let telefonoId = document.getElementById('telefonoId').value;
+            let direccionId = document.getElementById('direccionId').value;
+            let ciudadId = document.getElementById('ciudadId').value;
+            let paisId = document.getElementById('paisId').value;
+            if (nombresId = ) {
+                swal('error', 'ingresar nombres', 'error');
+                return false;
+            }
+            if (telefonoId = '') {
+                swal('error', 'ingresar telefono', 'error');
+                return false;
+            }
+            if (direccionId = '') {
+                swal('error', 'ingresar direccion', 'error');
+                return false;
+            }
+            if (ciudadId = '') {
+                swal('error', 'ingresar ciudad', 'error');
+                return false;
+            }
+            if (paisId = '') {
+                swal('error', 'ingresar pais', 'error');
+                return false;
+            }
+        })
+    </script>
 
-<script>
-    $('#procederId').click(function(){
-        let nombresId = document.getElementById('nombresId').value;
-        let telefonoId = document.getElementById('telefonoId').value;
-        let direccionId = document.getElementById('direccionId').value;
-        let ciudadId = document.getElementById('ciudadId').value;
-        let paisId = document.getElementById('paisId').value;
-        if (nombresId = ) {
-            swal('error','ingresar nombres','error');
-            return false;
-        }
-        if (telefonoId ='') {
-            swal('error', 'ingresar telefono', 'error');
-            return false;
-        }
-        if (direccionId = '') {
-            swal('error', 'ingresar direccion', 'error');
-            return false;
-        }
-        if (ciudadId = '') {
-            swal('error', 'ingresar ciudad', 'error');
-            return false;
-        }
-        if (paisId = '') {
-            swal('error', 'ingresar pais', 'error');
-            return false;
-        }
-    })
-</script>
+
+}
 
 
 

@@ -4,6 +4,7 @@ using SistemaInventario.AccesoDatos.Repositorio.IRepositorio;
 using SistemaInventario.Models;
 using SistemaInventario.Models.ViewModels;
 using SistemaInventario.Utilidades;
+using Stripe.Checkout;
 using System.Security.Claims;
 
 namespace SistemaInventario.Areas.Inventario.Controllers
@@ -173,11 +174,60 @@ namespace SistemaInventario.Areas.Inventario.Controllers
                 await _unitOfWork.Save();
             }
             //stripe
+            var options = new SessionCreateOptions
+            {
+                SuccessUrl=_webUrl+$"inventario/carroCompras/OrdenConfirmacion?id-{carroComprasVM.Orden.Id}",
+                CancelUrl= _webUrl+"inventario/carroCompras/index",
+                LineItems = new List<SessionLineItemOptions>(),
+                Mode="payment"
+            };
+            foreach (var lista in carroComprasVM.CarroCompraLista)
+            {
+                var sessionLineItem = new SessionLineItemOptions
+                {
+                    PriceData= new SessionLineItemPriceDataOptions()
+                    {
+                        UnitAmount=(long)(lista.Precio*100), //siempre multiplicar por 100
+                        Currency = "usd",
+                        ProductData=new SessionLineItemPriceDataProductDataOptions
+                        {
+                            Name=lista.Producto.Descripcion
+                        },
+                    },
+                    Quantity=lista.Cantidad,
+                };
+                options.LineItems.Add(sessionLineItem);
+            }
+            var service = new SessionService();
+            Session session = service.Create(options);
+            _unitOfWork.Orden
+                .UpdatePagoStripeId(carroComprasVM.Orden.Id, session.Id, session.PaymentIntentId);
+            await _unitOfWork.Save();
+            Response.Headers.Add("Location", session.Url);//redireccion a stripe
+            return new StatusCodeResult(StatusCodes.Status303SeeOther);
             return RedirectToAction("OrdenConfirmacion",new {id=carroComprasVM.Orden.Id});
 
         }
         public async Task<IActionResult>OrdenConfirmacion(int id)
         {
+            var orden = await _unitOfWork.Orden
+                .GetFirstOrDefault(o=>o.Id==id, 
+                                      includeProperties:"UsuarioAplicacion");
+            var service = new SessionService();
+            Session session = service.Get(orden.SessionId);
+            if (session.PaymentStatus.ToLower()=="paid")
+            {
+                _unitOfWork.Orden.UpdatePagoStripeId(id, session.Id, session.PaymentIntentId);
+                _unitOfWork.Orden.UpdateEstado(id, DS.EstadoAprobado, DS.PagoEstadoAprobado);
+                await _unitOfWork.Save();
+            }
+            //borrar carro y la sesion del caarro
+            var carroCompra = await _unitOfWork.CarroCompras
+                .GetAll(u=>u.UsuarioAplicacionId==orden.UsuarioAplicacionId);
+            List<CarroCompras> carroComprasLista = carroCompra.ToList();
+            _unitOfWork.CarroCompras.RemoveRange(carroComprasLista);
+            await _unitOfWork.Save();
+            HttpContext.Session.SetInt32(DS.ssCarroCompras, 0);
             return View();
         }
 
