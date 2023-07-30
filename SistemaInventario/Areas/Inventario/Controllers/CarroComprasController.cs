@@ -79,6 +79,49 @@ namespace SistemaInventario.Areas.Inventario.Controllers
             return RedirectToAction("Index");
         }
 
+        public async Task<IActionResult> Proceder()
+        {
+            var claim = obtenerUsuarioId();
+            carroComprasVM = new CarroComprasVM()
+            {
+                Orden = new Models.Orden(),
+                CarroCompraLista = await _unitOfWork.CarroCompras
+                .GetAll(c => c.UsuarioAplicacionId == claim.Value,
+                        includeProperties: "Producto"),
+                Compania = await _unitOfWork.Compania.GetFirstOrDefault()
+            };
+            carroComprasVM.Orden.TotalOrden = 0;
+            carroComprasVM.Orden.UsuarioAplicacion = await _unitOfWork.UsuarioAplicacion
+                .GetFirstOrDefault(u => u.Id == claim.Value);
+
+            foreach (var lista in carroComprasVM.CarroCompraLista)
+            {
+                lista.Precio = lista.Producto.Precio;
+                carroComprasVM.Orden.TotalOrden += (lista.Precio * lista.Cantidad);
+            }
+            carroComprasVM.Orden.NombresCliente =
+                $"{carroComprasVM.Orden.UsuarioAplicacion.Nombres} {carroComprasVM.Orden.UsuarioAplicacion.Apellido}";
+            carroComprasVM.Orden.Telefono = carroComprasVM.Orden.UsuarioAplicacion.PhoneNumber;
+            carroComprasVM.Orden.Direccion = carroComprasVM.Orden.UsuarioAplicacion.Direccion;
+            carroComprasVM.Orden.Pais = carroComprasVM.Orden.UsuarioAplicacion.Pais;
+            carroComprasVM.Orden.Ciudad = carroComprasVM.Orden.UsuarioAplicacion.Ciudad;
+
+            //control stock
+            foreach(var lista in carroComprasVM.CarroCompraLista)
+            {
+                //capturar stock de c/ producto
+                var producto = await _unitOfWork.BodegaProducto
+                    .GetFirstOrDefault(b => b.ProductoId == lista.ProductoId &&
+                                       b.BodegaID == carroComprasVM.Compania.BodegaVentaId);
+                if (lista.Cantidad>producto.Cantidad)
+                {
+                    TempData[DS.Error] = $"Cantidad de producto {lista.Producto.Descripcion} excede el stock actual ({producto.Cantidad})";
+                    return RedirectToAction("Index");
+                }
+            }
+            return View(carroComprasVM);
+        }
+
         private Claim obtenerUsuarioId()
         {
             var claimIdentity = (ClaimsIdentity)User.Identity;
