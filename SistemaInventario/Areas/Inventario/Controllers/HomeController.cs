@@ -108,6 +108,11 @@ namespace SistemaInventario.Areas.Inventario.Controllers
             }
             await _unitOfWork.Save();
             TempData[DS.Exitosa] = "Producto agregado a carrito";
+            //agregar valor a la sesión
+            var carroLista = await _unitOfWork.CarroCompras.GetAll(c=>c.UsuarioAplicacionId==claim.Value);
+            var numeroProductos = carroLista.Count();
+            HttpContext.Session.SetInt32(DS.ssCarroCompras, numeroProductos);
+
             return RedirectToAction("Index");
         }
 

@@ -11,6 +11,7 @@ namespace SistemaInventario.Utilidades
         public const string Role_Cliente = "Cliente";
         public const string Role_Inventario = "Inventario";
         public const string Tipo_Entrada = "Entrada";
-        public const string Tipo_Salida = "Salida";        
+        public const string Tipo_Salida = "Salida";
+        public const string ssCarroCompras = "Sesion Carro Compras";
     }
 }
