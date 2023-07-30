@@ -25,8 +25,18 @@ namespace SistemaInventario.Areas.Inventario.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        public IActionResult Index(int pageNumber = 1, string busqueda="", string busquedaActual="")
+        public async Task<IActionResult> Index(int pageNumber = 1, string busqueda="", string busquedaActual="")
         {
+            //controlar sesion
+            var claim = obtenerUsuarioId();
+
+            if (claim!=null)
+            {
+                var carroLista = await _unitOfWork.CarroCompras.GetAll(c => c.UsuarioAplicacionId == claim.Value);
+                var numeroProductos = carroLista.Count();
+                HttpContext.Session.SetInt32(DS.ssCarroCompras, numeroProductos);
+            }
+
             if (!String.IsNullOrEmpty(busqueda))
             {
                 pageNumber = 1;
