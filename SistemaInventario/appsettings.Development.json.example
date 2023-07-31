@@ -1,0 +1,24 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "*",
+    "ApplicationDbContextConnection": "*"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "SendGrid": {
+    "SecretKey": "*",
+    "EmailFrom": "*"
+  },
+  "Stripe": {
+    "SecretKey": "*",
+    "PublishableKey": "*"
+  },
+  "DomainUrls": {
+    "WEB_URL": "*"
+  }
+}

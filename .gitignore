@@ -367,3 +367,4 @@ FodyWeavers.xsd
 /SistemaInventario/appsettings.json
 /SistemaInventario/wwwroot/lib/select2/*
 /SistemaInventario/wwwroot/lib/select2-bootstrap-5-theme/*
+/SistemaInventario/appsettings.Development.json
