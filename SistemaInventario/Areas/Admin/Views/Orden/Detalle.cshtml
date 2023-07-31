@@ -113,7 +113,7 @@
                                 <div class="col-9">
                                     @if (User.IsInRole(DS.Role_Admin))
                                     {
-                                        <input asp-for="Orden.Carrier" class="form-control" />
+                                        <input asp-for="Orden.Carrier" class="form-control" id="carrierId"/>
                                     }
                                     else
                                     {
@@ -126,7 +126,7 @@
                                 <div class="col-9">
                                     @if (User.IsInRole(DS.Role_Admin))
                                     {
-                                        <input asp-for="Orden.NumeroEnvio" class="form-control" />
+                                        <input asp-for="Orden.NumeroEnvio" class="form-control" itemid="numeroEnvioId"/>
                                     }
                                     else
                                     {
@@ -212,7 +212,7 @@
                                 @if (Model.Orden.EstadoOrden == DS.EstadoEnProceso)
                                 {
                                     <input type="submit" value="Enviar Orden" onclick="return validarIngreso()"
-                                        class="btn btn-primary form-control" formaction="/Admin/Orden/EnviarOrden"
+                                        class="btn btn-success form-control" formaction="/Admin/Orden/EnviarOrden"
                                         formmethod="post"/>
                                 }
                             }
@@ -227,6 +227,24 @@
         </div>
     </div>
 </form>
+@section Scripts{
+    <script>
+        function validarIngreso(){
+            let carrierId = document.getElementById('carrierId').value;
+            let numeroEnvioId = document.getElementById('numeroEnvioId').value;
+            if(carrierId==''){
+                swal('Error','Ingrese carrier','error');
+                return false;
+            }
+            if(numeroEnvioId==''){
+                swal('Error', 'Ingrese n° envio', 'error');
+                return false;
+            }
+            return true;
+        }
+
+    </script>
+}
 
 
 
