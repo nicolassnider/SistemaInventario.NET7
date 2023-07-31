@@ -205,6 +205,20 @@
                                     </div>
                                 </li>
                             </ul>
+                            @if(User.IsInRole(DS.Role_Admin)){
+                                @if(Model.Orden.EstadoOrden==DS.EstadoAprobado){
+                                    <a asp-action="Procesar" asp-route-id="@Model.Orden.Id" class="btn btn-primary form-control">Empezar a procesar</a>
+                                }
+                                @if (Model.Orden.EstadoOrden == DS.EstadoEnProceso)
+                                {
+                                    <input type="submit" value="Enviar Orden" onclick="return validarIngreso()"
+                                        class="btn btn-primary form-control" formaction="/Admin/Orden/EnviarOrden"
+                                        formmethod="post"/>
+                                }
+                            }
+                            else{
+                                <label class="btn btn-primary form-control">@Model.Orden.EstadoOrden</label>
+                            }
 
                         </div>
                     </div>
