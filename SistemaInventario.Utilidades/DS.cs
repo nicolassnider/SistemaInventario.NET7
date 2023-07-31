@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-
-namespace SistemaInventario.Utilidades
+﻿namespace SistemaInventario.Utilidades
 {
     public static class DS
     {
