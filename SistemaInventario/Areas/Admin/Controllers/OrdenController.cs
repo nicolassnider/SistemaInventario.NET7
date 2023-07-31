@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SistemaInventario.AccesoDatos.Repositorio.IRepositorio;
 using SistemaInventario.Models;
+using SistemaInventario.Models.ViewModels;
 using SistemaInventario.Utilidades;
 using System.Security.Claims;
 
@@ -12,6 +13,8 @@ namespace SistemaInventario.Areas.Admin.Controllers
     public class OrdenController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        [BindProperty]
+        private OrdenDetalleVm ordenDetalleVm { get; set; }
         public OrdenController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
@@ -28,6 +31,19 @@ namespace SistemaInventario.Areas.Admin.Controllers
             var claimIdentity = (ClaimsIdentity)User.Identity;
             var claim = claimIdentity.FindFirst(ClaimTypes.NameIdentifier);
             return claim;
+        }
+        public async Task<IActionResult>Detalle(int id)
+        {
+            ordenDetalleVm = new OrdenDetalleVm()
+            {
+                Orden = await _unitOfWork.Orden
+                .GetFirstOrDefault(o=>o.Id== id,
+                                      includeProperties:"UsuarioAplicacion"),
+                OrdenDetalleLista = await _unitOfWork.OrdenDetalle
+                .GetAll(d=>d.OrdenId==id,
+                           includeProperties:"Producto")
+            };
+            return View(ordenDetalleVm);
         }
         #region
         [HttpGet]
